@@ -1,0 +1,22 @@
+
+&pio{
+	dsi_active: dsi_active {
+		pins_cmd_dat {
+			pinmux = <PINMUX_GPIO5__FUNC_GPIO5>;
+			input-enable;
+			slew-rate = <0>;
+			bias-disable;
+		};
+	};
+};
+
+
+&hall{
+	interrupt-parent = <&pio>;
+	interrupts = <5 IRQ_TYPE_LEVEL_LOW>;
+	hall,gpio_irq = <&pio 5 0>;
+	pinctrl-names = "hall_active";
+	pinctrl-0 = <&dsi_active>;
+	status = "okay";
+};
+

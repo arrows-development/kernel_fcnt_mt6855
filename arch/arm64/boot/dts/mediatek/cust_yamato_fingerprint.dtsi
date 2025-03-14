@@ -1,0 +1,83 @@
+/* Copyright (c) 2014, The Linux Foundation. All rights reserved.
+*
+* This program is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General Public License version 2 and
+* only version 2 as published by the Free Software Foundation.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*/
+
+
+/*begin, fps, fingerprint config*/
+
+&spi1 {
+	status = "ok";
+	#address-cells = <1>;
+	#size-cells = <0>;
+	fingerprint_fpc: fingerprint_fpc {
+		compatible = "mediatek,fpsensor";
+		reg = <0>;
+		fpc,enable-wakeup;
+		fpc,rst_gpio = <&pio 157 0x0>;
+		fpc,irq_gpio = <&pio 15 0>;
+		vdd_io-supply = <&mt6369_vfp>;
+		spi-max-frequency = <10000000>;
+		netlink-event = <30>;
+		pinctrl-names = "fpsensor_fpc_rst_low", "fpsensor_fpc_rst_high",
+			"fpsensor_fpc_power_high", "fpsensor_fpc_power_low",
+			"fpsensor_fp_cs_low";
+		pinctrl-0 = <&fpsensor_fpc_rst_low>;
+		pinctrl-1 = <&fpsensor_fpc_rst_high>;
+		pinctrl-2 = <&fpsensor_fpc_power_high>;
+		pinctrl-3 = <&fpsensor_fpc_power_low>;
+		pinctrl-4 = <&fpsensor_fp_cs_low>;
+		status = "okay";
+	};
+};
+
+&pio {
+	fpsensor_fpc_rst_low: fpsensor_fpc_rst_low {
+		pins_cmd_dat {
+			pinmux = <PINMUX_GPIO157__FUNC_GPIO157>;
+			slew-rate = <1>;
+			output-low;
+		};
+	};
+
+	fpsensor_fpc_rst_high: fpsensor_fpc_rst_high {
+		pins_cmd_dat {
+			pinmux = <PINMUX_GPIO157__FUNC_GPIO157>;
+			slew-rate = <1>;
+			output-high;
+		};
+	};
+
+	fpsensor_fpc_power_high: fpsensor_fpc_power_high {
+		pins_cmd_dat {
+			pinmux = <PINMUX_GPIO183__FUNC_GPIO183>;
+			slew-rate = <1>;
+			output-high;
+		};
+	};
+
+	fpsensor_fpc_power_low: fpsensor_fpc_power_low {
+		pins_cmd_dat {
+			pinmux = <PINMUX_GPIO183__FUNC_GPIO183>;
+			slew-rate = <1>;
+			output-low;
+		};
+	};
+
+	fpsensor_fp_cs_low: fpsensor_fp_cs_low {
+		pins_cmd_dat {
+			pinmux = <PINMUX_GPIO66__FUNC_GPIO66>;
+			slew-rate = <1>;
+			output-low;
+		};
+	};
+};
+
+/*end, fps, fingerprint config*/

@@ -1,0 +1,113 @@
+/*display start*/
+&i2c6 {
+	status = "okay";
+	lcd_bias_i2c@3e {
+		compatible = "mtk,i2c_lcd_bias";
+		reg = <0x3e>;
+		mtk,enp = <&pio 134 0>;
+		mtk,enn = <&pio 182 0>;
+		mtk,tp_reset = <&pio 3 0>;
+		pinctrl-names = "lcd_enn_default", "lcd_enn_output_high",
+				"lcd_enn_output_low", "lcd_enp_default",
+				"lcd_enp_output_high", "lcd_enp_output_low",
+				"tp_reset_default", "tp_reset_output_high",
+				"tp_reset_output_low";
+		pinctrl-0 = <&bias_enn_default>;
+		pinctrl-1 = <&bias_enn_output_high>;
+		pinctrl-2 = <&bias_enn_output_low>;
+		pinctrl-3 = <&bias_enp_default>;
+		pinctrl-4 = <&bias_enp_output_high>;
+		pinctrl-5 = <&bias_enp_output_low>;
+		pinctrl-6 = <&tp_pins_reset_default>;
+		pinctrl-7 = <&tp_pins_reset_output_high>;
+		pinctrl-8 = <&tp_pins_reset_output_low>;
+	};
+
+	aw99703-bl@36 {
+		compatible = "awinic,aw99703-bl";
+		reg = <0x36>;
+		/* brightness map level 1:256,2:1024,3:2048 */
+		aw99703,bl-map = <3>;
+		aw99703,using-lsb;
+		aw99703,ovp-level = <2>; /* 38V(default) */
+		aw99703,ocp-level = <1>; /* 2.7A(default) */
+		aw99703,switch-freq = <1>; /* 1000kHz(default) */
+		aw99703,auto-freq-high = <0x09>;
+		aw99703,auto-freq-low = <0x05>;
+		aw99703,bl-fscal-led = <0x15>; /* 20mA(default) */
+		aw99703,bl-channel = <3>;
+		aw99703,turn-on-ramp = <0x09>; /* 8ms(default) */
+		aw99703,turn-off-ramp = <0x09>; /* 8ms(default) */
+		aw99703,pwm-trans-dim = <0>; /* 2ms(default) */
+		aw99703,i2c-trans-dim = <0x07>; /* 1us(default) */
+		aw99703,pwm-mode = <1>; /* 0 pwm enable,1 PWM disable */
+		aw99703,map-type = <1>; /* linear */
+		aw99703,work-mode = <1>; /* backlight */
+		aw99703,flash-timeout-time = <0x05>; /* 500ms(default) */
+		aw99703,flash-current = <0x08>; /* 59.2mA(default) */
+		aw99703,efuse-config = <0x1C 0x61 0x61 0x4C 0x2C 0xC0 0x08 0x00 0x01 0xC0 0x00 0x00 0x50>;
+
+		status = "okay";
+	};
+};
+
+&pio {
+	bias_enn_default: enn_default {
+	};
+
+	bias_enn_output_high: enn_output_high {
+	pins_cmd_dat {
+		pinmux = <PINMUX_GPIO182__FUNC_GPIO182>;
+			slew-rate = <1>;
+			output-high;
+		 };
+	 };
+
+	bias_enn_output_low: enn_output_low {
+		pins_cmd_dat {
+			pinmux = <PINMUX_GPIO182__FUNC_GPIO182>;
+			slew-rate = <1>;
+			output-low;
+		};
+	};
+
+	bias_enp_default: enp_default {
+	};
+
+	bias_enp_output_high: enp_output_high {
+		pins_cmd_dat {
+			pinmux = <PINMUX_GPIO134__FUNC_GPIO134>;
+			slew-rate = <1>;
+			output-high;
+		};
+	};
+
+	bias_enp_output_low: bias_enp_output_low {
+		pins_cmd_dat {
+			pinmux = <PINMUX_GPIO134__FUNC_GPIO134>;
+			slew-rate = <1>;
+			output-low;
+		};
+	};
+
+	tp_pins_reset_default: reset_default {
+	};
+
+	tp_pins_reset_output_high: reset_output_high {
+		pins_cmd_dat {
+			pinmux = <PINMUX_GPIO3__FUNC_GPIO3>;
+			slew-rate = <1>;
+			output-high;
+		};
+	};
+
+	tp_pins_reset_output_low: reset_output_low {
+		pins_cmd_dat {
+			pinmux = <PINMUX_GPIO3__FUNC_GPIO3>;
+			slew-rate = <1>;
+			output-low;
+		};
+	};
+};
+
+/*display end*/

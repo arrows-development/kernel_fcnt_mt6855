@@ -1,0 +1,46 @@
+/*Touch start*/	
+&spi3 {	
+    status = "okay";
+    bootmode = <&chosen>;
+    pinctrl-names = "default", "ctp_spi_mode";
+	pinctrl-0 = <&ctp_jdgc_pins_default>;
+	pinctrl-1 = <&ctp_jdgc_spi_mode>;
+    jadard@0 {	
+        status = "okay";	
+        compatible = "jadard,jdcommon";	
+        reg = <0>;	
+	spi-max-frequency = <10000000>; //10M
+	interrupt-parent = <&pio>;
+	interrupts = <22 IRQ_TYPE_EDGE_FALLING 22 0>;
+	jadard,panel-sense-nums = <18 32>;
+	jadard,panel-coords = <0 720 0 1560>;
+	jadard,panel-max-points = <10>;
+	jadard,int-is-edge = <1>;
+	jadard,irq-gpio = <&pio 22 02>;
+	jadard,rst-gpio = <&pio 3 0>;
+	
+    };
+
+    gcore_tp@1 {
+                compatible = "gcore,touchscreen";
+                reg = <1>;
+                spi-max-frequency = <48000000>;
+                gcore,irq-gpio = <&pio 22 02>;
+                gcore,rst-gpio = <&pio 3 0>;
+    };
+	
+};
+/*Touch end*/
+&pio {
+                ctp_jdgc_pins_default: pins_default {
+	            };
+	            ctp_jdgc_spi_mode: spimode_default {
+	                pins_cmd_dat {
+	                    pinmux = <PINMUX_GPIO76__FUNC_SPI3_MI>,
+		                     <PINMUX_GPIO75__FUNC_SPI3_MO>,
+		                     <PINMUX_GPIO73__FUNC_SPI3_CLK>,
+		                     <PINMUX_GPIO74__FUNC_SPI3_CSB>;
+		             drive-strength = <7>;//16ma
+                    };
+             };
+};

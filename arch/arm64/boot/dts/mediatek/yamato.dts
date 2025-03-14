@@ -1,0 +1,345 @@
+// SPDX-License-Identifier: (GPL-2.0 OR MIT)
+/*
+ * Copyright (C) 2021 MediaTek Inc.
+ */
+/dts-v1/;
+/plugin/;
+#include <dt-bindings/interrupt-controller/arm-gic.h>
+#include <dt-bindings/interrupt-controller/irq.h>
+#include <dt-bindings/pinctrl/mt6855-pinfunc.h>
+
+&odm {
+	led0:led@0 {
+		compatible = "mediatek,red";
+		led_mode = <0>;
+		data = <1>;
+		pwm_config = <0 0 0 0 0>;
+	};
+	led1:led@1 {
+		compatible = "mediatek,green";
+		led_mode = <0>;
+		data = <1>;
+		pwm_config = <0 0 0 0 0>;
+	};
+	led2:led@2 {
+		compatible = "mediatek,blue";
+		led_mode = <0>;
+		data = <1>;
+		pwm_config = <0 0 0 0 0>;
+	};
+	led3:led@3 {
+		compatible = "mediatek,jogball-backlight";
+		led_mode = <0>;
+		data = <1>;
+		pwm_config = <0 0 0 0 0>;
+	};
+	led4:led@4 {
+		compatible = "mediatek,keyboard-backlight";
+		led_mode = <0>;
+		data = <1>;
+		pwm_config = <0 0 0 0 0>;
+	};
+	led5:led@5 {
+		compatible = "mediatek,button-backlight";
+		led_mode = <0>;
+		data = <1>;
+		pwm_config = <0 0 0 0 0>;
+	};
+	led6:led@6 {
+		compatible = "mediatek,lcd-backlight";
+		led_mode = <4>;
+		data = <1>;
+		pwm_config = <0 1 0 0 0>;
+	};
+	vibrator0:vibrator@0 {
+		compatible = "mediatek,vibrator";
+		vib_timer = <25>;
+		vib_limit = <9>;
+		vib_vol= <9>;
+	};
+};
+
+&mtk_leds {
+	compatible = "mediatek,disp-leds";
+	backlight {
+		label = "lcd-backlight";
+		led_mode = <4>;
+		max-brightness = <255>;
+		max-hw-brightness = <255>;
+		led-bits = <8>;
+		trans-bits = <8>;
+		default-state = "on";
+		pwm_config = <0 1 0 0 0>;
+	};
+};
+
+&pio {
+	mtkfb_pins_lcm_rst_out1_gpio: lcm_rst_out1_gpio {
+		pins_cmd_dat {
+			pinmux = <PINMUX_GPIO95__FUNC_GPIO95>;
+			slew-rate = <1>;
+			output-high;
+		};
+	};
+
+	mtkfb_pins_lcm_rst_out0_gpio: lcm_rst_out0_gpio {
+		pins_cmd_dat {
+			pinmux = <PINMUX_GPIO95__FUNC_GPIO95>;
+			slew-rate = <1>;
+			output-low;
+		};
+	};
+
+	mtkfb_pins_tp_rst_out1_gpio: tp_rst_out1_gpio {
+		pins_cmd_dat {
+			pinmux = <PINMUX_GPIO3__FUNC_GPIO3>;
+			slew-rate = <1>;
+			output-high;
+		};
+	};
+	mtkfb_pins_tp_rst_out0_gpio: tp_rst_out0_gpio {
+		pins_cmd_dat {
+			pinmux = <PINMUX_GPIO3__FUNC_GPIO3>;
+			slew-rate = <1>;
+			output-low;
+		};
+	};
+
+	mtkfb_pins_lcm_dsi_te: lcm_dsi_te {
+		pins_cmd_dat {
+			pinmux = <PINMUX_GPIO94__FUNC_DSI_TE>;
+		};
+	};
+};
+
+&mtkfb {
+	pinctrl-names =
+		"tp_rst_out1_gpio", "tp_rst_out0_gpio",
+		"lcm_rst_out1_gpio", "lcm_rst_out0_gpio",
+		"mode_te_te";
+	pinctrl-0 = <&mtkfb_pins_lcm_rst_out1_gpio>;
+	pinctrl-1 = <&mtkfb_pins_lcm_rst_out0_gpio>;
+	pinctrl-2 = <&mtkfb_pins_tp_rst_out1_gpio>;
+	pinctrl-3 = <&mtkfb_pins_tp_rst_out0_gpio>;
+	pinctrl-4 = <&mtkfb_pins_lcm_dsi_te>;
+	status = "okay";
+};
+
+&dispsys_config {
+	pinctrl-names =
+		"lcm_rst_out1_gpio", "lcm_rst_out0_gpio",
+		"mode_te_te";
+	pinctrl-0 = <&mtkfb_pins_lcm_rst_out1_gpio>;
+	pinctrl-1 = <&mtkfb_pins_lcm_rst_out0_gpio>;
+	pinctrl-2 = <&mtkfb_pins_lcm_dsi_te>;
+	status = "okay";
+};
+
+&dsi0 {
+	status = "okay";
+	#address-cells = <1>;
+	#size-cells = <0>;
+	switch_fps = <60>;
+	panel1@0 {
+		compatible = "lce,jd9365t,vdo,60hz";
+		reg = <0>;
+		1p8-supply = <&mt6369_vtp>;
+		lcd_reset-gpios = <&pio 95 0>;
+		tp_reset-gpios = <&pio 3 0>;
+		pinctrl-names = "default";
+		port {
+			panel_in1: endpoint {
+				remote-endpoint = <&dsi_out>;
+			};
+		};
+	};
+	panel2@0 {
+		compatible = "lide,gc7202m,vdo,60hz";
+		reg = <1>;
+		1p8-supply = <&mt6369_vtp>;
+		lcd_reset-gpios = <&pio 95 0>;
+		tp_reset-gpios = <&pio 3 0>;
+		pinctrl-names = "default";
+		port {
+			panel_in2: endpoint {
+				remote-endpoint = <&dsi_out>;
+			};
+		};
+	};
+	ports {
+		port {
+			dsi_out: endpoint {
+				remote-endpoint = <&panel_in1>;
+			};
+		};
+	};
+};
+
+/* GPS GPIO standardization start */
+&pio {
+	gps_pins_default: gps_default {
+	};
+	gps_l1_lna_pins_ol: gps_l1_lna@0 {
+		pins_cmd_dat {
+			pinmux = <PINMUX_GPIO133__FUNC_GPIO133>;
+			output-low;
+		};
+	};
+	gps_l1_lna_pins_dsp_ctrl: gps_l1_lna@1 {
+		pins_cmd_dat {
+			pinmux = <PINMUX_GPIO133__FUNC_GPS_L1_ELNA_EN>;
+		};
+	};
+	gps_l1_lna_pins_oh: gps_l1_lna@2 {
+		pins_cmd_dat {
+			pinmux = <PINMUX_GPIO133__FUNC_GPIO133>;
+			output-high;
+		};
+	};
+	gps_l5_lna_pins_ol: gps_l5_lna@0 {
+		pins_cmd_dat {
+			pinmux = <PINMUX_GPIO134__FUNC_GPIO134>;
+			output-low;
+		};
+	};
+	gps_l5_lna_pins_dsp_ctrl: gps_l5_lna@1 {
+		pins_cmd_dat {
+			pinmux = <PINMUX_GPIO134__FUNC_GPS_L5_ELNA_EN>;
+		};
+	};
+	gps_l5_lna_pins_oh: gps_l5_lna@2 {
+		pins_cmd_dat {
+			pinmux = <PINMUX_GPIO134__FUNC_GPIO134>;
+			output-high;
+		};
+	};
+};
+&gps {
+	pinctrl-names = "default",
+		"gps_l1_lna_disable",
+		"gps_l1_lna_dsp_ctrl",
+		"gps_l1_lna_enable",
+		"gps_l5_lna_disable",
+		"gps_l5_lna_dsp_ctrl",
+		"gps_l5_lna_enable";
+	pinctrl-0 = <&gps_pins_default>;
+	pinctrl-1 = <&gps_l1_lna_pins_ol>;
+	pinctrl-2 = <&gps_l1_lna_pins_dsp_ctrl>;
+	pinctrl-3 = <&gps_l1_lna_pins_oh>;
+	pinctrl-4 = <&gps_l5_lna_pins_ol>;
+	pinctrl-5 = <&gps_l5_lna_pins_dsp_ctrl>;
+	pinctrl-6 = <&gps_l5_lna_pins_oh>;
+	status = "okay";
+};
+/* GPS GPIO standardization end */
+
+#include "mediatek/cust_mt6855_touch_720x1560.dtsi"
+#include "mediatek/cust_mt6855_camera_v4l2.dtsi"
+#include "mediatek/display.dtsi"
+#include "mediatek/cust_mt6855_hall.dtsi"
+/* NFC Start */
+&i2c0 {
+	nq@28 {
+                compatible = "nxp,sn-nci";
+                reg = <0x28>;
+                clock-frequency = <400000>;
+                nxp,sn-irq = <&pio 2 0x00>;
+                nxp,sn-ven-rstn = <&pio 161 0x00>;
+                nxp,sn-clkreq = <&pio 160 0x00>;
+                bootmode = <&chosen>;
+                status = "okay";
+	};
+};
+
+&clock_buffer_ctrl {
+  mediatek,xo-bbck4 = <1>;
+};
+
+&spi5 {
+       /* SPI, The SPI lines must be exclusive by eSE device */
+       p61@0 {
+               compatible = "nxp,p61";
+               reg = <0x00>;
+               spi-max-frequency = <20000000>;
+               nxp,nfcc = "0-0028";
+               nxp,nfcc-reserved-r00 = "1-0028";
+               nxp,nfcc-reserved-r01 = "2-0028";
+               nxp,nfcc-reserved-r02 = "3-0028";
+               nxp,nfcc-reserved-r03 = "4-0028";
+               status = "okay";
+       };
+};
+/* NFC End */
+
+&i2c6 {
+	spk: speaker_amp@5c {
+		compatible = "richtek,rt5512";
+		#sound-dai-cells = <0>;
+		reg = <0x5c>;
+		status = "okay";
+		sound-name-prefix = "Left";
+	};
+};
+
+&i2c9 {
+	aw883xx_smartpa_0: aw883xx_smartpa@34 {
+		compatible = "awinic,aw883xx_smartpa";
+		#sound-dai-cells = <0>;
+		reg = <0x34>;
+		reset-gpio = <&pio 20 0>;
+		irq-gpio = <&pio 46 0x0>;
+		sync-load = <1>;
+		sound-channel = <0>;
+		re-min = <1000>;
+		re-max= <40000>;
+		status = "okay";
+	};
+};
+
+&i2c7 {
+	status = "ok";
+	haptic_nv@5A{
+		compatible = "awinic,haptic_nv";
+		reg = < 0x5A >;
+		aw862xx_i2c_addr = < 0x58 >;
+		 /* aw8624x_no_reset; */ /* 使用 aw8624x 系列芯片时，取消注释 */
+		reset-gpio = <&pio 12 0>;
+		irq-gpio = <&pio 11 0>;
+		aw862xx_gain_bypass = < 1 >;
+		aw862xx_vib_lk_f0_cali = < 0 >;
+		aw862xx_vib_mode = < 2 >; /* mode: RAM -> 2; CONT -> 3 */
+		aw862xx_vib_f0_pre = < 2050 >;
+ 
+		aw862xx_vib_f0_cali_percen = < 7 >;
+		aw862xx_vib_cont_drv1_lvl = < 0x7F >;
+		aw862xx_vib_lra_vrms = < 1800 >; /* Motor rated voltage, mV */
+		aw862xx_vib_cont_brk_time = < 0x06 >;
+		aw862xx_vib_cont_brk_gain = < 0x08 >;
+		aw862xx_vib_cont_drv1_time = < 0x04 >;
+		aw862xx_vib_cont_drv2_time = < 0x14 >;
+		aw862xx_vib_cont_track_margin = < 0x0F >;
+		aw862xx_vib_d2s_gain = < 0x07 >;
+		aw862xx_vib_trig_config = < 0 0 0 1 0 2 0
+		 0 0 0 1 0 2 0
+		 0 0 0 1 0 2 0 >;
+		aw862xx_vib_duration_time = < 20 30 40 60 >;
+		aw862xx_vib_is_enabled_track_en;
+		/* aw862xx_vib_is_enabled_auto_brk; */
+	};
+};
+
+&sound {
+	mediatek,spk-i2s = <3 0>;
+	mediatek,speaker-codec {
+		sound-dai = <&aw883xx_smartpa_0>;
+	};
+};
+
+&pdc {
+	pd_vbus_upper_bound = <9000000>;
+};
+
+#include "mediatek/cust_yamato_fingerprint.dtsi"
+
+#include <yamato/cust.dtsi>
+/*End of this file, DO NOT ADD ANYTHING HERE*/
